@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대전관저고등학교 과학실 예약 시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'chemistry': {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        'physics': {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            200: '#e9d5ff',
+                            300: '#d8b4fe',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            700: '#7c3aed',
+                            800: '#6b21a8',
+                            900: '#581c87',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">🧪⚡ 과학실 예약 시스템</h1>
+            <p class="text-lg text-gray-600">대전관저고등학교</p>
+            <div class="mt-4 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
+                <p class="text-yellow-800 font-semibold">⚠️ 서버 연결 실패</p>
+                <p class="text-yellow-700 text-sm mt-2">
+                    현재 서버에 연결할 수 없습니다. 로컬 모드로 실행 중입니다.<br>
+                    다른 사용자와 예약 정보를 공유하려면 서버를 실행해주세요.
+                </p>
+            </div>
+        </header>
+
+        <!-- 과학실 선택 -->
+        <div class="max-w-4xl mx-auto mb-8">
+            <div class="text-center mb-6">
+                <label for="labSelect" class="block text-lg font-semibold text-gray-700 mb-3">과학실 선택</label>
+                <select id="labSelect" class="px-6 py-3 text-lg font-semibold rounded-lg border-2 border-gray-300 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    <option value="chemistry">🧪 화학실 (1층)</option>
+                    <option value="physics">⚡ 물리실 (3층)</option>
+                </select>
+            </div>
+            
+            <!-- 선택된 과학실 표시 -->
+            <div class="text-center">
+                <div id="selectedLabDisplay" class="text-xl font-bold text-chemistry-600 bg-chemistry-50 px-6 py-3 rounded-lg border-2 border-chemistry-200 inline-block">
+                    🧪 화학실 (1층)이 선택되었습니다
+                </div>
+            </div>
+        </div>
+
+        <!-- 주간 네비게이션 -->
+        <div class="max-w-4xl mx-auto mb-6">
+            <div class="flex justify-between items-center bg-white rounded-lg shadow-md p-4">
+                <button id="prevWeekBtn" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                    ← 이전 주
+                </button>
+                <div class="text-center">
+                    <div id="weekRange" class="text-lg font-semibold text-gray-900"></div>
+                    <div id="weekStatus" class="text-sm text-gray-600"></div>
+                </div>
+                <button id="nextWeekBtn" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                    다음 주 →
+                </button>
+            </div>
+        </div>
+
+        <!-- 시간표 -->
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- 요일 헤더 -->
+            <div class="grid grid-cols-6 bg-gray-100">
+                <div class="p-4 font-semibold text-gray-700 border-r border-gray-200"></div>
+                <div class="p-4 font-semibold text-gray-700 border-r border-gray-200 text-center">월</div>
+                <div class="p-4 font-semibold text-gray-700 border-r border-gray-200 text-center">화</div>
+                <div class="p-4 font-semibold text-gray-700 border-r border-gray-200 text-center">수</div>
+                <div class="p-4 font-semibold text-gray-700 border-r border-gray-200 text-center">목</div>
+                <div class="p-4 font-semibold text-gray-700 border-r border-gray-200 text-center">금</div>
+            </div>
+
+            <!-- 날짜 헤더 -->
+            <div class="grid grid-cols-6 bg-gray-50">
+                <div class="p-2 font-semibold text-gray-700 border-r border-gray-200"></div>
+                <div id="date-0" class="p-2 text-sm text-gray-600 border-r border-gray-200 text-center"></div>
+                <div id="date-1" class="p-2 text-sm text-gray-600 border-r border-gray-200 text-center"></div>
+                <div id="date-2" class="p-2 text-sm text-gray-600 border-r border-gray-200 text-center"></div>
+                <div id="date-3" class="p-2 text-sm text-gray-600 border-r border-gray-200 text-center"></div>
+                <div id="date-4" class="p-2 text-sm text-sm text-gray-600 border-r border-gray-200 text-center"></div>
+            </div>
+
+            <!-- 교시별 행 -->
+            <div id="timetableBody">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </div>
+
+        <!-- 범례 -->
+        <div class="max-w-4xl mx-auto mt-8 bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">범례</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-white border border-gray-300 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">예약 가능</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-chemistry-200 border border-chemistry-400 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">🧪 화학실 예약됨</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-physics-200 border border-physics-400 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">⚡ 물리실 예약됨</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 서버 실행 안내 -->
+        <div class="max-w-4xl mx-auto mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-blue-900 mb-4">🖥️ 서버 실행 방법</h3>
+            <div class="text-blue-800 text-sm space-y-2">
+                <p><strong>1. 명령 프롬프트(cmd) 열기:</strong></p>
+                <p class="ml-4">Windows 키 + R → cmd 입력 → Enter</p>
+                
+                <p><strong>2. 프로젝트 폴더로 이동:</strong></p>
+                <p class="ml-4 bg-gray-100 p-2 rounded font-mono text-xs">
+                    cd "D:\OneDrive - 대전광역시교육청\바탕 화면\cursor\science-lab-reservation"
+                </p>
+                
+                <p><strong>3. 의존성 설치:</strong></p>
+                <p class="ml-4 bg-gray-100 p-2 rounded font-mono text-xs">npm install</p>
+                
+                <p><strong>4. 서버 실행:</strong></p>
+                <p class="ml-4 bg-gray-100 p-2 rounded font-mono text-xs">npm start</p>
+                
+                <p><strong>5. 브라우저에서 접속:</strong></p>
+                <p class="ml-4 bg-gray-100 p-2 rounded font-mono text-xs">http://localhost:3000</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let currentLab = 'chemistry';
+        let currentWeekOffset = 0;
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            checkBookingCompletion();
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // 저장된 과학실 선택 복원
+            const savedLab = localStorage.getItem('selectedLab');
+            if (savedLab) {
+                currentLab = savedLab;
+            }
+            
+            setupEventListeners();
+            updateLabDisplay();
+            updateWeekDisplay();
+            updateTimetable();
+        }
+
+        function setupEventListeners() {
+            // 과학실 선택
+            document.getElementById('labSelect').addEventListener('change', function() {
+                currentLab = this.value;
+                // 선택된 과학실을 로컬 스토리지에 저장
+                localStorage.setItem('selectedLab', currentLab);
+                updateLabDisplay();
+                updateTimetable();
+            });
+
+            // 주간 네비게이션
+            document.getElementById('prevWeekBtn').addEventListener('click', function() {
+                currentWeekOffset--;
+                updateWeekDisplay();
+                updateTimetable();
+            });
+
+            document.getElementById('nextWeekBtn').addEventListener('click', function() {
+                currentWeekOffset++;
+                updateWeekDisplay();
+                updateTimetable();
+            });
+        }
+
+        function updateLabDisplay() {
+            const labSelect = document.getElementById('labSelect');
+            const selectedLabDisplay = document.getElementById('selectedLabDisplay');
+            
+            labSelect.value = currentLab;
+            
+            if (currentLab === 'chemistry') {
+                selectedLabDisplay.className = 'text-xl font-bold text-chemistry-600 bg-chemistry-50 px-6 py-3 rounded-lg border-2 border-chemistry-200 inline-block';
+                selectedLabDisplay.innerHTML = '🧪 화학실 (1층)이 선택되었습니다';
+            } else {
+                selectedLabDisplay.className = 'text-xl font-bold text-physics-600 bg-physics-50 px-6 py-3 rounded-lg border-2 border-physics-200 inline-block';
+                selectedLabDisplay.innerHTML = '⚡ 물리실 (3층)이 선택되었습니다';
+            }
+        }
+
+        function getCurrentWeekDates() {
+            const today = new Date();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - today.getDay() + 1 + (currentWeekOffset * 7));
+            
+            const weekDates = [];
+            for (let i = 0; i < 5; i++) {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + i);
+                weekDates.push(date);
+            }
+            return weekDates;
+        }
+
+        function formatDate(date) {
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+
+        function updateWeekDisplay() {
+            const weekDates = getCurrentWeekDates();
+            const weekRange = document.getElementById('weekRange');
+            const weekStatus = document.getElementById('weekStatus');
+            
+            weekRange.textContent = `${formatDate(weekDates[0])} - ${formatDate(weekDates[4])}`;
+            
+            if (currentWeekOffset === 0) {
+                weekStatus.textContent = '이번 주';
+            } else if (currentWeekOffset > 0) {
+                weekStatus.textContent = `${currentWeekOffset}주 후`;
+            } else {
+                weekStatus.textContent = `${Math.abs(currentWeekOffset)}주 전`;
+            }
+
+            // 날짜 헤더 업데이트
+            weekDates.forEach((date, index) => {
+                document.getElementById(`date-${index}`).textContent = formatDate(date);
+            });
+        }
+
+        function updateTimetable() {
+            const timetableBody = document.getElementById('timetableBody');
+            const weekDates = getCurrentWeekDates();
+            const reservations = getReservations();
+            const currentLabName = currentLab === 'chemistry' ? '화학실' : '물리실';
+            
+            let html = '';
+            
+            // 1교시부터 7교시까지
+            for (let period = 1; period <= 7; period++) {
+                html += `<div class="grid grid-cols-6 border-b border-gray-200">`;
+                html += `<div class="p-4 font-semibold text-gray-700 bg-gray-50 border-r border-gray-200 flex items-center justify-center">${period}교시</div>`;
+                
+                // 월요일부터 금요일까지
+                for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
+                    const date = weekDates[dayIndex];
+                    const dateString = date.toISOString().split('T')[0];
+                    
+                    // 현재 주의 현재 과학실 예약 확인
+                    const reservation = reservations.find(r => 
+                        r.lab === currentLabName && 
+                        r.date === dateString && 
+                        r.period === period
+                    );
+                    
+                    if (reservation) {
+                        // 예약된 셀
+                        const labColor = reservation.lab === '화학실' ? 'chemistry' : 'physics';
+                        const labIcon = reservation.lab === '화학실' ? '🧪' : '⚡';
+                        
+                        html += `
+                            <div class="p-2 border-r border-gray-200 bg-${labColor}-200 border-${labColor}-400">
+                                <div class="text-center text-${labColor}-800">
+                                    <div class="text-xs font-bold">${labIcon} 예약됨</div>
+                                    <div class="text-xs mt-1 font-semibold">${reservation.teacherName}</div>
+                                    <div class="text-xs">${reservation.className}</div>
+                                    <button type="button" 
+                                            class="delete-reservation-btn mt-1 bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded transition-colors cursor-pointer"
+                                            data-lab="${reservation.lab}" 
+                                            data-date="${reservation.date}" 
+                                            data-period="${reservation.period}">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // 예약 가능한 셀
+                        html += `
+                            <div class="p-2 border-r border-gray-200 bg-white hover:bg-gray-50 cursor-pointer"
+                                 onclick="openBookingForm(${dayIndex}, ${period})">
+                                <div class="text-center text-gray-400">
+                                    <div class="text-sm">예약 가능</div>
+                                    <div class="text-xs mt-1">클릭하여 예약</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                html += `</div>`;
+            }
+            
+            timetableBody.innerHTML = html;
+            
+            // 삭제 버튼 이벤트 리스너 추가
+            document.querySelectorAll('.delete-reservation-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    const labName = this.getAttribute('data-lab');
+                    const date = this.getAttribute('data-date');
+                    const period = parseInt(this.getAttribute('data-period'));
+                    
+                    deleteReservation(labName, date, period);
+                });
+            });
+        }
+
+        function openBookingForm(dayIndex, period) {
+            const weekDates = getCurrentWeekDates();
+            const selectedDate = weekDates[dayIndex];
+            const labName = currentLab === 'chemistry' ? '화학실' : '물리실';
+            const dateString = selectedDate.toISOString().split('T')[0];
+            
+            const confirmMessage = `${labName} ${selectedDate.toLocaleDateString('ko-KR')} ${period}교시 예약을 진행하시겠습니까?`;
+            
+            if (confirm(confirmMessage)) {
+                const bookingUrl = `booking.html?lab=${labName}&date=${dateString}&period=${period}`;
+                const newWindow = window.open(bookingUrl, '_blank', 'width=600,height=800,scrollbars=yes,resizable=yes');
+                
+                if (!newWindow) {
+                    if (confirm('팝업 창이 차단되었습니다.\n같은 창에서 예약 페이지를 열까요?')) {
+                        window.location.href = bookingUrl;
+                    }
+                }
+            }
+        }
+
+        function deleteReservation(labName, date, period) {
+            const confirmMessage = `정말로 이 예약을 삭제하시겠습니까?\n\n과학실: ${labName}\n날짜: ${new Date(date).toLocaleDateString('ko-KR')}\n교시: ${period}교시`;
+            
+            if (confirm(confirmMessage)) {
+                const reservations = getReservations();
+                const updatedReservations = reservations.filter(reservation => {
+                    return !(reservation.lab === labName && 
+                             reservation.date === date && 
+                             reservation.period === period);
+                });
+                
+                localStorage.setItem('reservations', JSON.stringify(updatedReservations));
+                updateTimetable();
+            }
+        }
+
+        function getReservations() {
+            return JSON.parse(localStorage.getItem('reservations') || '[]');
+        }
+
+        // 페이지 로드 시 예약 완료 확인 (알림 없이)
+        function checkBookingCompletion() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('bookingCompleted') === 'true') {
+                // URL에서 전달된 과학실 정보가 있으면 해당 과학실로 설정
+                const labParam = urlParams.get('lab');
+                if (labParam && (labParam === 'chemistry' || labParam === 'physics')) {
+                    currentLab = labParam;
+                    localStorage.setItem('selectedLab', currentLab);
+                }
+                // URL에서 파라미터 제거
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        // 페이지 포커스 시 업데이트
+        window.addEventListener('focus', function() {
+            updateTimetable();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과학실 예약 - 대전관저고등학교</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'chemistry': {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        'physics': {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            200: '#e9d5ff',
+                            300: '#d8b4fe',
+                            400: '#c084fc',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            700: '#7c3aed',
+                            800: '#6b21a8',
+                            900: '#581c87',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- 헤더 -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">🧪⚡ 과학실 예약</h1>
+            <h2 class="text-2xl text-gray-700 mb-4">대전관저고등학교</h2>
+            <button onclick="goBack()" class="text-blue-600 hover:text-blue-800 font-medium">
+                ← 시간표로 돌아가기
+            </button>
+        </header>
+
+        <!-- 예약 정보 요약 -->
+        <div class="max-w-2xl mx-auto mb-8 bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">예약 정보</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <span class="text-gray-600">과학실:</span>
+                    <span id="labInfo" class="ml-2 font-semibold text-gray-900"></span>
+                </div>
+                <div>
+                    <span class="text-gray-600">날짜:</span>
+                    <span id="dateInfo" class="ml-2 font-semibold text-gray-900"></span>
+                </div>
+                <div>
+                    <span class="text-gray-600">교시:</span>
+                    <span id="periodInfo" class="ml-2 font-semibold text-gray-900"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 예약 폼 -->
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-semibold text-gray-900 mb-6">예약 정보 입력</h3>
+            
+            <form id="bookingForm" class="space-y-6">
+                <div>
+                    <label for="teacherName" class="block text-sm font-medium text-gray-700 mb-2">
+                        교사명 *
+                    </label>
+                    <input type="text" 
+                           id="teacherName" 
+                           name="teacherName" 
+                           required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="교사명을 입력하세요">
+                </div>
+
+                <div>
+                    <label for="purpose" class="block text-sm font-medium text-gray-700 mb-2">
+                        용도 *
+                    </label>
+                    <input type="text" 
+                           id="purpose" 
+                           name="purpose" 
+                           required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="예: 화학실험, 물리실험, 과학수업 등">
+                </div>
+
+                <div>
+                    <label for="className" class="block text-sm font-medium text-gray-700 mb-2">
+                        반 *
+                    </label>
+                    <input type="text" 
+                           id="className" 
+                           name="className" 
+                           required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="예: 1-3반, 2-1반 등">
+                </div>
+
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" 
+                            onclick="goBack()" 
+                            class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                        취소
+                    </button>
+                    <button type="button" 
+                            onclick="submitReservation()"
+                            class="flex-1 bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                        예약하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // URL 파라미터에서 예약 정보 가져오기
+        function getUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                lab: urlParams.get('lab'),
+                date: urlParams.get('date'),
+                period: urlParams.get('period')
+            };
+        }
+
+        // 예약 정보 표시
+        function displayReservationInfo() {
+            const params = getUrlParams();
+            
+            if (params.lab && params.date && params.period) {
+                const labName = params.lab;
+                const date = new Date(params.date);
+                const period = params.period;
+                
+                document.getElementById('labInfo').textContent = labName;
+                document.getElementById('dateInfo').textContent = date.toLocaleDateString('ko-KR');
+                document.getElementById('periodInfo').textContent = `${period}교시`;
+            }
+        }
+
+        // 예약하기 버튼 클릭 처리
+        async function submitReservation() {
+            const teacherName = document.getElementById('teacherName').value.trim();
+            const purpose = document.getElementById('purpose').value.trim();
+            const className = document.getElementById('className').value.trim();
+
+            if (!teacherName || !purpose || !className) {
+                return;
+            }
+
+            const params = getUrlParams();
+            
+            // 중복 예약 확인
+            if (await checkDuplicateReservation(params.lab, params.date, params.period)) {
+                alert('이미 예약된 시간입니다. 다른 시간을 선택해주세요.');
+                return;
+            }
+
+            // 예약 정보 생성
+            const reservation = {
+                lab: params.lab,
+                date: params.date,
+                period: parseInt(params.period),
+                teacherName: teacherName,
+                purpose: purpose,
+                className: className,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                // 서버에 예약 저장
+                console.log('서버에 예약 저장 중:', reservation);
+                const response = await fetch('/api/reservations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(reservation)
+                });
+
+                console.log('서버 응답 상태:', response.status);
+
+                if (response.ok) {
+                    // 성공적으로 저장됨
+                    const savedReservation = await response.json();
+                    console.log('예약이 성공적으로 저장되었습니다:', savedReservation);
+                    alert('✅ 예약이 성공적으로 완료되었습니다!');
+                } else {
+                    const errorData = await response.json();
+                    console.error('서버 오류:', errorData);
+                    alert(`❌ 예약 실패: ${errorData.error}`);
+                    return;
+                }
+            } catch (error) {
+                console.error('예약 저장 오류:', error);
+                // 오프라인 모드: 로컬 스토리지에 저장
+                console.log('오프라인 모드로 예약 저장');
+                const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+                reservations.push(reservation);
+                localStorage.setItem('reservations', JSON.stringify(reservations));
+                alert('⚠️ 오프라인 모드로 예약이 저장되었습니다. 서버 연결 시 동기화됩니다.');
+            }
+
+            // 부모 창 새로고침 후 즉시 창 닫기 (alert 없이)
+            if (window.opener && !window.opener.closed) {
+                // 현재 예약한 과학실 정보를 URL에 포함
+                const labParam = params.lab === '화학실' ? 'chemistry' : 'physics';
+                window.opener.location.href = `index.html?bookingCompleted=true&lab=${labParam}`;
+                window.close();
+            } else {
+                const labParam = params.lab === '화학실' ? 'chemistry' : 'physics';
+                window.location.href = `index.html?bookingCompleted=true&lab=${labParam}`;
+            }
+        }
+
+        // 서버에서 중복 예약 확인
+        async function checkDuplicateReservation(labName, date, period) {
+            try {
+                console.log('중복 예약 확인 중:', { labName, date, period });
+                const response = await fetch(`/api/reservations?lab=${encodeURIComponent(labName)}&date=${encodeURIComponent(date)}&period=${period}`);
+                console.log('중복 확인 응답 상태:', response.status);
+                
+                if (response.ok) {
+                    const reservations = await response.json();
+                    console.log('서버에서 받은 예약 목록:', reservations);
+                    return reservations.length > 0;
+                } else {
+                    console.log('서버 응답 오류:', response.status);
+                }
+            } catch (error) {
+                console.error('중복 확인 오류:', error);
+            }
+            
+            // 오프라인 모드: 로컬 스토리지에서 확인
+            console.log('오프라인 모드로 중복 확인');
+            const reservations = JSON.parse(localStorage.getItem('reservations') || '[]');
+            return reservations.some(reservation => 
+                reservation.lab === labName && 
+                reservation.date === date && 
+                reservation.period === parseInt(period)
+            );
+        }
+
+        // 뒤로 가기
+        function goBack() {
+            if (window.opener) {
+                // 부모 창이 있으면 새로고침하고 닫기
+                window.opener.location.reload();
+                window.close();
+            } else {
+                // 부모 창이 없으면 메인 페이지로 이동
+                window.location.href = 'index.html';
+            }
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            displayReservationInfo();
+        });
+    </script>
+</body>
+</html>
